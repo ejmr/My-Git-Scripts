@@ -1,0 +1,49 @@
+#!/usr/local/bin/fish
+#
+# ## DESCRIPTION
+#
+# Clone a Git repository from a URI on the clipboard and then
+# execute a given command on the directory of the new repo.
+#
+# ## REQUIREMENTS
+#
+# **This script only works with the Fish shell!**
+#
+# ## EXAMPLE
+#
+# Let's say I have "https://github.com/fisherman/sol" on the clipboard,
+# which is a URL to a theme for the Fish shell.  After cloning this
+# repository I can install the theme by running the Fisherman plugin
+# manager on the directory of the newly cloned repository.  Again,
+# assuming I have the URL above on my clipboard, I can do all of this
+# with one command:
+#
+#     $ git clone-then-eval-on-repo fisher
+#
+# This is equivalent to:
+#
+#     $ git clone "https://github.com/fisherman/sol" "./sol"
+#     $ fisher "./sol"
+#
+# In combination with how easily I can copy URLs in my browser, this Git
+# utility script can be very useful for tasks like the example above,
+# i.e. running an installer or manager on whatever I just cloned.
+#
+# ## AUTHOR
+#
+# Written by Eric James Michael Ritz, August 2018.
+#
+# ## LICENSE
+#
+# This code belongs to the Public Domain.
+#
+# ## SEE ALSO
+#
+# git-clone(1), fish(1)
+#
+########################################################################
+
+set --local REPO_URI (xclip -out -sel clipboard)
+set --local COMMAND $argv[1]
+
+git clone "$REPO_URI"; and eval "$COMMAND" ./(ls -t1 | head -1)
