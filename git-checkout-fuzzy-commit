@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# git-checkout-fuzzy-commit(1) - checkout a commit via fuzzy matching
+# ===================================================================
+#
+# ## SYNOPSIS
+#
+# `git-checkout-fuzzy-commit`
+#
+# ## REQUIREMENTS
+#
+# - Git
+# - fzf
+#
+# ## DESCRIPTION
+#
+# Performs a checkout of a specific commit in a Git repository.
+# The program chooses the commit via a fuzzy search of the subject lines
+# of the commit messages, i.e. their first line.
+#
+# ## INSTALLATIOn
+#
+# While not required, I recommend you alias this to something
+# shorter if you intend to use it with any frequency.  Personally
+# I use `git-coc`.
+#
+# ## COPYRIGHT
+#
+# Eric James Michael Ritz, 2018.
+#
+# This code belongs to the Public Domain.
+#
+# ## SEE ALSO
+#
+# git-log(1), fzf(1)
+#
+########################################################################
+
+commits=$(git log --all --pretty=oneline --abbrev-commit --reverse)
+commit=$(echo "$commits" | fzf --tac +s +m +e)
+
+git checkout $(echo "$commit" | sed "s/ .*//")

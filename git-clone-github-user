@@ -1,0 +1,19 @@
+#!/usr/local/bin/fish
+#
+# This script takes the name of a GitHub user and clones all of his or
+# her public repositories into a new directory named after the user.
+
+set --local github_user $argv[1]
+set --local ua_name git-clone-github-user
+set --local ua_version 0.1.0
+set --local user_agent "$ua_name/$ua_version"
+
+mkdir "$github_user"; and cd "$github_user"
+
+curl -A $user_agent https://api.github.com/users/$github_user/repos ^/dev/null \
+| jq --raw-output '.[] | [.name, .html_url] | join(" ")'                       \
+| while read --local repo_name repo_url
+	git clone $repo_url $repo_name
+end
+
+exit 0

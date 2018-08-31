@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# The command `git branch --edit-description` lets us write a chunk
+# of text describing the current branch.  It is useful for providing
+# a broad overview of a branch, its purpose, goals, important details
+# regarding the implementation, and so on.
+#
+# However, Git provides us no easy command for viewing
+# branch descriptions.  The "easiest" thing we can do is to use
+# `git-config` to get the description, which Git saves as the property
+# `branch.FOO.description` for each branch "FOO" that has a description.
+#
+# This shell script provides a more simple command for viewing the
+# description of the current branch.
+#
+################################################################################
+
+BRANCH=$(git symbolic-ref --short HEAD)
+
+git config --get "branch.${BRANCH}.description"

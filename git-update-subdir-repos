@@ -1,0 +1,46 @@
+#!/bin/sh
+#
+# GiT-UPDATE-SUBDIR-REPOS
+# =======================
+#
+# ## SYNOPSIS
+#
+#     $ git-update-subdir-repos <NAME>
+#
+# ## DESCRIPTION
+#
+# Updates the Git repositories in all sub-directories which match the
+# given name, in a case-insensitive search.  The script assumes that
+# both...
+#
+#     git fetch origin
+#     git merge --ff-only origin/master
+#
+# ...are valid commands for the repositories.
+#
+# ## REQURIMENTS
+#
+# - Git
+# - fd
+#
+# ## BUGS
+#
+# This script assumes that the matching sub-directories are not only
+# Git repositories but that they are current on the `master` branch
+# and that fast-forward merging changes from `origin/master` into that
+# branch will not cause any problems, which they easily could for
+# repositories where I am currently doing some development.  The script
+# makes no attempt to handle this scenario gracefully.
+#
+# ## COPYRIGHT
+#
+# Written by Eric James Michael Ritz, 2018.
+#
+# This code belongs to the Public Domain.
+#
+#######################################################################
+
+REPO_NAME_PATTERN="$1"
+
+fd --type d --max-depth 1 --color 'never' "$REPO_NAME_PATTERN" --exec git -C '{}' fetch origin
+fd --type d --max-depth 1 --color 'never' "$REPO_NAME_PATTERN" --exec git -C '{}' merge --ff-only origin/master

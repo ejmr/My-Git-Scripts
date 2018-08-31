@@ -1,0 +1,19 @@
+#!/usr/local/bin/fish
+#
+# This script takes the name of a GitHub organization and clones all of
+# its repositories as sub-directories into a new directory named after
+# that organization.
+
+set --local organization $argv[1]
+
+set --local ua_name git-clone-github-organization
+set --local ua_version 0.1.0
+set --local user_agent "$ua_name/$ua_version"
+
+mkdir "$organization"; and cd "$organization"
+
+curl -A $user_agent https://api.github.com/orgs/$organization/repos | jq --raw-output '.[] | .html_url' | while read --local org_repo
+	git clone $org_repo
+end
+
+exit 0

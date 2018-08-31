@@ -1,0 +1,126 @@
+#!/bin/sh
+#
+# git-ls-github-repos(1) - list a user's GitHub repositories
+# ==========================================================
+#
+# ## SYNOPSIS
+#
+# `git-ls-github-repos` <user>
+#
+# ## REQUIREMENTS
+#
+# - Git
+# - curl
+# - jq
+#
+# ## DESCRIPTION
+#
+# This program accepts the username of a GitHub user and proceeds to
+# display URLs for all of his or her repositories on standard output.
+# Each repository appears on its own line so that you can use this
+# script as a tool elsewhere, like other shell scripts, to read in the
+# individual repository URLs and do something with them (e.g. clone).
+#
+# ## EXAMPLES
+#
+# Show the URLs for my repositories on standard output:
+#
+#     $ git-ls-github-repos ejmr
+#     https://github.com/ejmr/php-mode
+#     https://github.com/ejmr/LNVL
+#     https://github.com/ejmr/Luvent
+#     https://github.com/ejmr/git-ls-github-forks
+#     https://github.com/ejmr/random-gokifu-sgf
+#
+# This is a script to create a directory named for a GitHub user
+# and then clone all of his public repositories in that directory.
+# Note that this example is for Fish, my preferred shell.
+#
+#     mkdir /tmp/zonuexe; and cd /tmp/zonuexe
+#
+#     git-ls-github-repos "zonuexe" \
+#     | while read --local repo_url
+#         git clone $repo_url
+#     end
+#
+# ## BUGS
+#
+# This program exists for use on Linux and probably will not work
+# on other operating systems, unless one runs this program within a
+# Linux-ish environment, e.g. good 'ole Cygwin on Windows, or the
+# POSIX-ish world of OSX.  Maybe it works in those circumstances,
+# and maybe not.  I do not care either way, to be honest.  I would
+# like to think it would be simple to tweak this script to work in
+# those other environments.  But being the selfish programmer I am,
+# I make no attempt to test this script in any environment other than
+# my personal Linux-running laptop.
+#
+# ## TODO
+#
+# 1. Add a usage message and display as necessary.
+# 2. Support a `-h`, `--help` flag to show usage.
+# 3. Warn the user about rate limit caps.
+# 4. And/or display the temporary file of JSON data.
+# 5. Optionally display repository names and discriptions.
+#
+# ## COPYRIGHT
+#
+# Eric James Michael Ritz, May 2018.
+#
+# This code belongs to the Public Domain.
+#
+# ## SEE ALSO
+#
+# git-remote(1), curl(1), jq(1)
+#
+########################################################################
+
+
+
+# All network requests to GitHub go through this URL.
+API_URL="https://api.github.com"
+
+# GitHub rejects API requests which do not include the 'User-Agent'
+# (UA) header, i.e. the HTTP header.  So our script plays nice and
+# defines a UA we can use and which GitHub could (hopefully) grep
+# for easily in their server logs if ever necessary.
+USER_AGENT_NAME="git-ls-github-repos"
+USER_AGENT_VERSION="0.1.0"
+USER_AGENT_IMPLEMENTATION="/bin/sh"
+USER_AGENT="$USER_AGENT_NAME/$USER_AGENT_VERSION ($USER_AGENT_IMPLEMENTATION)"
+
+
+
+# For debugging purposes we save the output in this file, which is
+# also useful in the event that we exceed the rate-limit of GitHub's
+# API, or the service is down, or our wireless modem exploded into
+# flames, or some wizard drops by and now we have to dump some ring
+# in a Goddamn mountain with no wi-fi, or whatever.
+BACKUP_OUTPUT_FILE="$(mktemp 'ls-github-repos.XXXXXXX')"
+
+
+
+# The GitHub username whose repositories we want to show.
+GITHUB_USERNAME="$1"
+
+
+# We are now finally ready to invoke cURL.  Our request is:
+#
+#     GET /users/:username/repos
+#
+# The result is a massive amount of JSON which we save in the
+# $BACKUP_OUTPUT_FILE we defined above.  Meanwhile, for the sake of
+# humans, we pipe the JSON to the `jq` program so that we can extract
+# the URLs for the user's repositories, displaying one URL per line.
+curl --silent                                       \
+     --user-agent "$USER_AGENT"                     \
+     --location                                     \
+     --header "Accept: application/vnd.github+json" \
+     "$API_URL/users/$GITHUB_USERNAME/repos"        \
+     | tee "$BACKUP_OUTPUT_FILE"                    \
+     | jq --raw-output --monochrome-output '.[] | .html_url'
+
+
+
+# Did we get this far?  Whew---let's get the Hell out of here.
+exit 0
