@@ -22,6 +22,7 @@
 #
 # - Git
 # - fd
+# - GNU Parallel
 #
 # ## BUGS
 #
@@ -42,5 +43,5 @@
 
 REPO_NAME_PATTERN="$1"
 
-fd --type d --max-depth 1 --color 'never' "$REPO_NAME_PATTERN" --exec git -C '{}' fetch origin
-fd --type d --max-depth 1 --color 'never' "$REPO_NAME_PATTERN" --exec git -C '{}' merge --ff-only origin/master
+fd --type d --max-depth 1 --color 'never' "$REPO_NAME_PATTERN" \
+| parallel git -C '{}' fetch origin ';' git -C '{}' merge --ff-only origin/master

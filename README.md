@@ -52,6 +52,7 @@ programs:
 - [jq][] for processing [JSON][].
 - [fd][] as an alternative to `find`.
 - [xclip][] to manipulate the X11 clipboard.
+- [GNU Parallel][] to execute commands on multiple repositories.
 
 You do not need to install all of these programs, unless you intend
 to use *every* script in this project.
@@ -89,3 +90,4 @@ All code and data in this project belongs to the Public Domain.
 [JSON]: http://json.org/
 [fd]: https://github.com/sharkdp/fd
 [xclip]: https://github.com/astrand/xclip
+[GNU Parallel]: https://www.gnu.org/software/parallel/
