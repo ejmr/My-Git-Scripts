@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+# GIT-UPDATE-MASTER
+# =================
+#
+# ## SYNOPSIS
+#
+#     $ git update-master
+#
+# ## DESCRIPTION
+#
+# This script updates the `master` branch of the given repository.
+# It fetches updates from the repository origin, merges the u4pdates to
+# the remote `master` branch (see below), and then restores any changes
+# which may have been in progress prior to the update.
+# 
+# ## REQUIREMENTS
+# 
+# All you need is Git and good 'ole `sh`, nothing more.
+# 
+# ## BUGS
+# 
+# The script will only peform a fast-forward merge.  This means the script
+# will refuse to update the `master` branch if it cannot fast-forward,
+# meaning typically the merge requires its own commit.
+#
+# ## AUTHOR
+#
+# Eric James Michael Ritz, 2018.
+#
+#########################################################################
+
+git stash
+git fetch origin && git checkout master && git merge --ff-only origin/master && git checkout -
+git stash pop

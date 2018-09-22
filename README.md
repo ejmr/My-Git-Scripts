@@ -18,6 +18,10 @@ functionality.  What follows are brief examples of each, assuming
 they are installed in the manner described below.
 
 ```sh
+# Update the `master` branch from the remote repository,
+# temporarily stashing any changes I've made so far.
+$ git update-master
+
 # Show the description of the current branch, as written by
 # the standard command `git branch --edit-description`.
 $ git branch-show-description
